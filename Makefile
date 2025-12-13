@@ -17,3 +17,11 @@ restart:
 rm:
 	@echo "Removing the project..."
 	@docker-compose rm
+
+ps:
+	@echo "Listing the project..."
+	@docker-compose ps
+
+logs:
+	@echo "Listing the logs..."
+	@docker-compose logs
