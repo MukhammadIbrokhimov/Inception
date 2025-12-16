@@ -1,4 +1,4 @@
-FROM wordpress:6.5
+FROM alpine:3.23
 
 EXPOSE 80
 
