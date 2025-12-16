@@ -1,7 +1,7 @@
-FROM mariadb:11.1
+FROM alpine:3.23
 
-COPY ./mariadb /var/lib/mysql
+RUN apk update && \
+	apk add mariadb mariadb-client && \
+	apk add --no-cache bash
 
 EXPOSE 3306
-
-CMD ["mysqld"]
