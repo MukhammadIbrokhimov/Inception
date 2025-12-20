@@ -19,6 +19,29 @@ services:
       - inception-network
     env_file:
       - .env
+    healthcheck:
+      test: [ "CMD", "curl", "-k", "http://localhost" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  wordpress:
+    container_name: wordpress
+    build:
+      context: .
+      dockerfile: requirements/wordpress/Dockerfile
+    volumes:
+      - ./wordpress:/var/www/html
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=${DB_USER}
+      - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
+      - WORDPRESS_DB_NAME=${DB_NAME}
+    restart: unless-stopped
+    networks:
+      - inception-network
+    depends_on:
+      - mariadb
   mariadb:
     image: mariadb:11.1
     ports:
@@ -34,27 +57,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
-  wordpress:
-    image: wordpress:6.5
-    ports:
-      - "8080:80"
-    volumes:
-      - ./wordpress:/var/www/html
-    environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_USER=${DB_USER}
-      - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
-      - WORDPRESS_DB_NAME=${DB_NAME}
-    restart: unless-stopped
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
