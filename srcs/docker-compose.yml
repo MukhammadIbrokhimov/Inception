@@ -10,7 +10,7 @@ services:
       - "443:443"
     volumes:
       - ./requirements/nginx/conf:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
+      - nginx_certs:/etc/nginx/ssl
       - ./wordpress:/var/www/html
     depends_on:
       - wordpress
@@ -20,7 +20,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: [ "CMD", "curl", "-k", "http://localhost" ]
+      test: [ "CMD", "curl", "-k", "http://localhost:443" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
@@ -33,39 +33,43 @@ services:
     volumes:
       - ./wordpress:/var/www/html
     environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_USER=${DB_USER}
-      - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
-      - WORDPRESS_DB_NAME=${DB_NAME}
+      - .env
+      #ENV_FILE: "1"
     restart: unless-stopped
     networks:
       - inception-network
-    depends_on:
-      - mariadb
-  mariadb:
-    image: mariadb:11.1
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./mariadb:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-    restart: always
-    networks:
-      - app-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+      test: [ "CMD", "nc", "-z", "wordpress", "9000" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 30s
+    #depends_on:
+    #  - mariadb
+    #mariadb:
+    #  image: mariadb:11.1
+    #  ports:
+    #    - "3306:3306"
+    #  volumes:
+    #    - ./mariadb:/var/lib/mysql
+    #  environment:
+    #    - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    #    - MYSQL_DATABASE=${DB_NAME}
+    #    - MYSQL_USER=${DB_USER}
+    #    - MYSQL_PASSWORD=${DB_PASSWORD}
+    #  restart: always
+    #  networks:
+    #    - app-network
+    #  healthcheck:
+    #    test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+    #    interval: 1m30s
+    #    timeout: 30s
+    #    retries: 5
+    #    start_period: 30s
 
 networks:
-  app-network:
+  inception-network:
     driver: bridge
 volumes:
-  mariadb:
   wordpress:
+  nginx_certs:
