@@ -44,32 +44,33 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-    #depends_on:
-    #  - mariadb
-    #mariadb:
-    #  image: mariadb:11.1
-    #  ports:
-    #    - "3306:3306"
-    #  volumes:
-    #    - ./mariadb:/var/lib/mysql
-    #  environment:
-    #    - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-    #    - MYSQL_DATABASE=${DB_NAME}
-    #    - MYSQL_USER=${DB_USER}
-    #    - MYSQL_PASSWORD=${DB_PASSWORD}
-    #  restart: always
-    #  networks:
-    #    - app-network
-    #  healthcheck:
-    #    test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
-    #    interval: 1m30s
-    #    timeout: 30s
-    #    retries: 5
-    #    start_period: 30s
+    depends_on:
+      - mariadb
+    mariadb:
+      build:
+        context: .
+        dockerfile: requirements/mariadb/Dockerfile
+      ports:
+        - "3306:3306"
+      volumes:
+        - ./mariadb:/var/lib/mysql
+      environment:
+        - .env
+      restart: unless-stopped
+      networks:
+        - inception-network
+      healthcheck:
+        test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+        interval: 1m30s
+        timeout: 30s
+        retries: 5
+        start_period: 30s
 
 networks:
   inception-network:
     driver: bridge
+
 volumes:
   wordpress:
   nginx_certs:
+  mariadb:

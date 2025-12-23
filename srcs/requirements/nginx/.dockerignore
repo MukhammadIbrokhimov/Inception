@@ -1,0 +1,12 @@
+.env
+.git
+.gitignore
+*.log
+*.swp
+*.swo
+*.bak
+*.tmp
+*.lock
+*.DS_Store
+*.DS_Store.*
+Dockerfile
