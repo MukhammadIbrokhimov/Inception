@@ -71,10 +71,14 @@ networks:
 
 volumes:
   wordpress:
-  nginx_certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/mukibrok/data/wordpress
   mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/mukibrok/Inception/srcs/requirements/mariadb
+      device: /home/mukibrok/data/mariadb
