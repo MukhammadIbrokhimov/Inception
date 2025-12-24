@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    container_name: nginx-server
+    image: custom-nginx
     build:
       context: .
       dockerfile: requirements/nginx/Dockerfile
@@ -17,8 +17,6 @@ services:
     restart: unless-stopped
     networks:
       - inception-network
-    env_file:
-      - .env
     healthcheck:
       test: [ "CMD", "curl", "-k", "http://localhost:443" ]
       interval: 1m30s
@@ -26,7 +24,7 @@ services:
       retries: 5
       start_period: 30s
   wordpress:
-    container_name: wordpress
+    image: custom-wordpress
     build:
       context: .
       dockerfile: requirements/wordpress/Dockerfile
@@ -46,25 +44,26 @@ services:
       start_period: 30s
     depends_on:
       - mariadb
-    mariadb:
-      build:
-        context: .
-        dockerfile: requirements/mariadb/Dockerfile
-      ports:
-        - "3306:3306"
-      volumes:
-        - ./mariadb:/var/lib/mysql
-      environment:
-        - .env
-      restart: unless-stopped
-      networks:
-        - inception-network
-      healthcheck:
-        test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
-        interval: 1m30s
-        timeout: 30s
-        retries: 5
-        start_period: 30s
+  mariadb:
+    image: custom-mariadb
+    build:
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    environment:
+      - .env
+    networks:
+      - inception-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 networks:
   inception-network:
@@ -74,3 +73,8 @@ volumes:
   wordpress:
   nginx_certs:
   mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/mukibrok/Inception/srcs/requirements/mariadb
