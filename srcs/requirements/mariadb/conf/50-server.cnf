@@ -1,0 +1,30 @@
+#necessary to have mariadb work
+[mysqld]
+# user
+user = mysql
+# bind to all interfaces
+bind-address = 0.0.0.0
+# port
+port = 3306
+# datadir
+datadir = /var/lib/mysql
+# socket
+socket = /var/run/mysqld/mysqld.sock
+
+#not necessary as most of them are default i wrote just to learn
+
+# Skip reverse DNS lookups for client connections (improves performance)
+skip-name-resolve
+# Character set configuration (UTF-8 support for international characters)
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+# Error log location
+log_error = /var/log/mysql/error.log
+# Max allowed packet size (important for large WordPress uploads)
+max_allowed_packet = 64M
+# Maximum connections
+max_connections = 100
+# Storage engine (InnoDB is default and required for WordPress)
+default-storage-engine = InnoDB
+# innodb buffer pool size (adjust based on your system's RAM)
+innodb_buffer_pool_size = 128M
