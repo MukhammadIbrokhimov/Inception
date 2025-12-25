@@ -30,9 +30,8 @@ services:
       dockerfile: requirements/wordpress/Dockerfile
     volumes:
       - ./wordpress:/var/www/html
-    environment:
+    env_file:
       - .env
-      #ENV_FILE: "1"
     restart: unless-stopped
     networks:
       - inception-network
@@ -53,7 +52,7 @@ services:
       - "3306:3306"
     volumes:
       - ./mariadb:/var/lib/mysql
-    environment:
+    env_file:
       - .env
     networks:
       - inception-network
@@ -70,6 +69,7 @@ networks:
     driver: bridge
 
 volumes:
+  nginx_certs:
   wordpress:
     driver: local
     driver_opts:
@@ -81,4 +81,12 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/mukibrok/data/mariadb
+      device: /home/mukibrok/inception/data/mariadb
+
+secrets:
+  DB_ROOT_PASSWORD:
+    file: ./secrets/db_root_password
+  DB_PASSWORD:
+    file: ./secrets/db_password
+  WP_ADMIN_PASSWORD:
+    file: ./secrets/credentials/wp_admin_password
