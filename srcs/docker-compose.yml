@@ -11,7 +11,7 @@ services:
     volumes:
       - ./requirements/nginx/conf:/etc/nginx/conf.d
       - nginx_certs:/etc/nginx/ssl
-      - ./wordpress:/var/www/html
+      - wordpress:/var/www/html
     depends_on:
       - wordpress
     restart: unless-stopped
@@ -29,9 +29,20 @@ services:
       context: .
       dockerfile: requirements/wordpress/Dockerfile
     volumes:
-      - ./wordpress:/var/www/html
-    env_file:
-      - .env
+      - wordpress:/var/www/html
+    secrets:
+      - DB_PASSWORD
+      - WP_ADMIN_PASSWORD
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      WP_URL: ${WP_URL}
+      WP_TITLE: ${WP_TITLE}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+      WP_ADMIN_PASSWORD_FILE: run/secrets/wp_admin_password
+      DB_PASSWORD_FILE: run/secrets/db_password
     restart: unless-stopped
     networks:
       - inception-network
@@ -51,14 +62,20 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./mariadb:/var/lib/mysql
-    env_file:
-      - .env
+      - mariadb:/var/lib/mysql
+    secrets:
+      - DB_ROOT_PASSWORD
+      - DB_PASSWORD
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD_FILE: run/secrets/db_password
+      DB_ROOT_PASSWORD_FILE: run/secrets/db_root_password
     networks:
       - inception-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+      test: [ "CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p$$(cat /run/secrets/db_root_password)" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
@@ -75,18 +92,18 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/mukibrok/data/wordpress
+      device: /Users/muxammad/Desktop/Inception/data/wordpress
   mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/mukibrok/inception/data/mariadb
+      device: /Users/muxammad/Desktop/Inception/data/mariadb
 
 secrets:
   DB_ROOT_PASSWORD:
-    file: ./secrets/db_root_password
+    file: ../secrets/db_root_password.txt
   DB_PASSWORD:
-    file: ./secrets/db_password
+    file: ../secrets/db_password.txt
   WP_ADMIN_PASSWORD:
-    file: ./secrets/credentials/wp_admin_password
+    file: ../secrets/credentials.txt

@@ -18,9 +18,12 @@ RUN apk update && apk add --no-cache \
 	php-xml \
 	php-zip \
 	php-redis \
+	php-phar \
+	mariadb-client \
 	wget \
 	curl \
-	bash
+	bash \
+	netcat-openbsd
 
 RUN wget https://wordpress.org/latest.tar.gz && \
 	tar -xzvf latest.tar.gz && \
@@ -30,8 +33,12 @@ RUN wget https://wordpress.org/latest.tar.gz && \
 RUN chown -R nobody:nobody /var/www/html && \
 	chmod -R 755 /var/www/html
 
-RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php/php-fpm.d/www.conf && \
-	sed -i 's/;daemonize = yes/daemonize = no/g' /etc/php/php-fpm.d/www.conf
+RUN set -eux; \
+	CONF="$(find /etc -type f -path '*/php*/php-fpm.d/www.conf' -print -quit)"; \
+	echo "Using PHP-FPM config: $CONF"; \
+	ln -s /usr/sbin/php-fpm* /usr/bin/php-fpm; \ 
+	sed -i 's|^listen = .*|listen = 9000|' "$CONF"; \
+	sed -i 's|^;daemonize = yes|daemonize = no|' "$CONF"
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
 	chmod +x wp-cli.phar && \
