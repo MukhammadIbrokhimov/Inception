@@ -10,7 +10,6 @@ port = 3306
 datadir = /var/lib/mysql
 # socket
 socket = /var/run/mysqld/mysqld.sock
-
 #not necessary as most of them are default i wrote just to learn
 
 # Skip reverse DNS lookups for client connections (improves performance)

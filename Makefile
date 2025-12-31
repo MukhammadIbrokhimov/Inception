@@ -1,6 +1,9 @@
 COMPOSE_FILE=srcs/docker-compose.yml
 
 build:
+	@echo "Creating directories..."
+	mkdir -p /Users/muxammad/Desktop/Inception/data/mariadb
+	mkdir -p /Users/muxammad/Desktop/Inception/data/wordpress
 	@echo "Building the project..."
 	@docker compose -f $(COMPOSE_FILE) up --build
 

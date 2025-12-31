@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # Colors for debugging
@@ -9,6 +9,17 @@ NC='\033[0m'
 
 echo -e "${GREEN}=== MariaDB Entrypoint Starting ===${NC}"
 
+# Read secrets from Docker secrets files
+if [ -f /run/secrets/db_password ]; then
+	DB_PASSWORD=$(cat /run/secrets/db_password)
+	export DB_PASSWORD
+fi
+
+if [ -f /run/secrets/db_root_password ]; then
+	DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+	export DB_ROOT_PASSWORD
+fi
+
 # Check if the database system database (named 'mysql') exists
 if [ ! -d "/var/lib/mysql/mysql" ]; then
 	echo -e "${YELLOW}MariaDB not initialized. Starting installation...${NC}"
@@ -18,7 +29,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
 	# 2. Initialization: strictly install system tables. 
 	echo -e "${GREEN}Installing system tables...${NC}"
-	mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
+	mariadb-install-db --user=mysql --datadir=/var/lib/mysql > /dev/null
 
 	# 3. Temp Server: Start mysqld in background to run SQL commands
 	echo -e "${GREEN}Starting temporary server for configuration...${NC}"
@@ -31,7 +42,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 	# 4. Wait loop: Wait for server to be ready
 	echo -e "${GREEN}Waiting for MariaDB to start...${NC}"
 	for i in {30..0}; do
-		if mysqladmin ping --socket=/run/mysqld/mysqld.sock --silent; then
+		if /usr/bin/mariadb-admin ping --socket=/run/mysqld/mysqld.sock --silent; then
 			break
 		fi
 		echo "Waiting... $i"
@@ -47,7 +58,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 	echo -e "${GREEN}Configuring users and database...${NC}"
 	
 	# We use 'root' with no password initially (because it's fresh install)
-	mysql -u root --socket=/run/mysqld/mysqld.sock <<-EOSQL
+	/usr/bin/mariadb -u root --socket=/run/mysqld/mysqld.sock <<-EOSQL
 		FLUSH PRIVILEGES;
 
 		-- Create the WordPress Database
@@ -74,7 +85,7 @@ EOSQL
 	# 6. Shutdown: Stop the temp server so we can restart normally
 	# Fixed: Added -p"${DB_ROOT_PASSWORD}" because we just changed the password!
 	echo -e "${YELLOW}Stopping temporary server...${NC}"
-	if ! mysqladmin -u root -p"${DB_ROOT_PASSWORD}" --socket=/run/mysqld/mysqld.sock shutdown; then
+	if ! /usr/bin/mariadb-admin -u root -p"${DB_ROOT_PASSWORD}" --socket=/run/mysqld/mysqld.sock shutdown; then
 		echo -e "${RED}Shutdown failed. Killing process.${NC}"
 		kill -s TERM "$PID"
 	fi
