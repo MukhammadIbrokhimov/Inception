@@ -31,7 +31,6 @@ until nc -z "${DB_HOST}" 3306; do
 done
 
 if [ ! -f /var/www/html/wp-config.php ]; then
-	echo "Creating wp-config.php..."
 	wp config create \
 	--dbname="${DB_NAME}" \
 	--dbuser="${DB_USER}" \
