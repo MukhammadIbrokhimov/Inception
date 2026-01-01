@@ -10,13 +10,13 @@ NC='\033[0m'
 echo -e "${GREEN}=== MariaDB Entrypoint Starting ===${NC}"
 
 # Read secrets from Docker secrets files
-if [ -f /run/secrets/db_password ]; then
-	DB_PASSWORD=$(cat /run/secrets/db_password)
+if [ -f /run/secrets/DB_PASSWORD ]; then
+	DB_PASSWORD=$(cat /run/secrets/DB_PASSWORD)
 	export DB_PASSWORD
 fi
 
-if [ -f /run/secrets/db_root_password ]; then
-	DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+if [ -f /run/secrets/DB_ROOT_PASSWORD ]; then
+	DB_ROOT_PASSWORD=$(cat /run/secrets/DB_ROOT_PASSWORD)
 	export DB_ROOT_PASSWORD
 fi
 
@@ -33,7 +33,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
 	# 3. Temp Server: Start mysqld in background to run SQL commands
 	echo -e "${GREEN}Starting temporary server for configuration...${NC}"
-	/usr/bin/mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
+	/usr/bin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking &
 
 	# Get the PID of the temporary server
 	PID=$!
@@ -76,7 +76,6 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 		
 		-- Set Root Password (Last step to avoid locking ourselves out during this script)
 		ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASSWORD}';
-		
 		FLUSH PRIVILEGES;
 EOSQL
 

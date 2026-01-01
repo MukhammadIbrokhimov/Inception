@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  web:
+  nginx:
     image: custom-nginx
     build:
       context: .
@@ -41,8 +41,8 @@ services:
       WP_TITLE: ${WP_TITLE}
       WP_ADMIN_USER: ${WP_ADMIN_USER}
       WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-      WP_ADMIN_PASSWORD_FILE: run/secrets/wp_admin_password
-      DB_PASSWORD_FILE: run/secrets/db_password
+      WP_ADMIN_PASSWORD_FILE: /run/secrets/WP_ADMIN_PASSWORD
+      DB_PASSWORD_FILE: /run/secrets/DB_PASSWORD
     restart: unless-stopped
     networks:
       - inception-network
@@ -69,13 +69,13 @@ services:
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
-      DB_PASSWORD_FILE: run/secrets/db_password
-      DB_ROOT_PASSWORD_FILE: run/secrets/db_root_password
+      DB_PASSWORD_FILE: /run/secrets/DB_PASSWORD
+      DB_ROOT_PASSWORD_FILE: /run/secrets/DB_ROOT_PASSWORD
     networks:
       - inception-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p$$(cat /run/secrets/db_root_password)" ]
+      test: [ "CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p$$(cat /run/secrets/DB_ROOT_PASSWORD)" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
@@ -102,8 +102,8 @@ volumes:
 
 secrets:
   DB_ROOT_PASSWORD:
-    file: ../secrets/db_root_password.txt
+    file: /Users/muxammad/Desktop/Inception/secrets/db_root_password.txt
   DB_PASSWORD:
-    file: ../secrets/db_password.txt
+    file: /Users/muxammad/Desktop/Inception/secrets/db_password.txt
   WP_ADMIN_PASSWORD:
-    file: ../secrets/credentials.txt
+    file: /Users/muxammad/Desktop/Inception/secrets/credentials.txt
