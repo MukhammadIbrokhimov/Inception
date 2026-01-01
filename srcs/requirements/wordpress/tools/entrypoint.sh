@@ -2,14 +2,13 @@
 set -e
 
 # Read secrets from Docker secrets files
-if [ -f /run/secrets/db_password ]; then
-	DB_PASSWORD=$(cat /run/secrets/db_password)
+if [ -f /run/secrets/DB_PASSWORD ]; then
+	DB_PASSWORD=$(cat /run/secrets/DB_PASSWORD)
 	export DB_PASSWORD
 fi
 
-if [ -f /run/secrets/wp_admin_password ]; then
-	# Parse credentials file (expected format: username:password:email or one per line)
-	WP_ADMIN_PASSWORD="$(tr -d '\r\n' < /run/secrets/wp_admin_password)"
+if [ -f /run/secrets/WP_ADMIN_PASSWORD ]; then
+	WP_ADMIN_PASSWORD="$(cat /run/secrets/WP_ADMIN_PASSWORD)"
 	export WP_ADMIN_PASSWORD
 fi
 
@@ -30,16 +29,8 @@ echo "Waiting for MariaDB..."
 until nc -z "${DB_HOST}" 3306; do
   sleep 1
 done
-#until /usr/bin/mariadb-admin ping \
-#	-h"${DB_HOST}" \
-#	-u"${DB_USER}" \
-#	-p"${DB_PASSWORD}" \
-#	--silent; do
-#	sleep 1
-#done
 
 if [ ! -f /var/www/html/wp-config.php ]; then
-	echo "Creating wp-config.php..."
 	wp config create \
 	--dbname="${DB_NAME}" \
 	--dbuser="${DB_USER}" \

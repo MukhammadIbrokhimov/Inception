@@ -29,4 +29,14 @@ ps:
 
 logs:
 	@echo "Listing the logs..."
-	@docker compose -f $(COMPOSE_FILE) logs
+	docker compose -f $(COMPOSE_FILE) logs
+
+clean:
+	@echo "Cleaning the project..."
+	@docker compose -f $(COMPOSE_FILE) down --volumes
+	@docker container prune -f
+	@docker network prune -f
+	@docker volume prune -f
+	@docker image prune -af
+	@rm -rf ./data
+	@echo "Project cleaned successfully"
