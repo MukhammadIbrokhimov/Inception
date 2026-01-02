@@ -92,18 +92,18 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Users/muxammad/Desktop/Inception/data/wordpress
+      device: ${VOL_PATH}/wordpress
   mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /Users/muxammad/Desktop/Inception/data/mariadb
+      device: ${VOL_PATH}/mariadb
 
 secrets:
   DB_ROOT_PASSWORD:
-    file: /Users/muxammad/Desktop/Inception/secrets/db_root_password.txt
+    file: ../secrets/db_root_password.txt
   DB_PASSWORD:
-    file: /Users/muxammad/Desktop/Inception/secrets/db_password.txt
+    file: ../secrets/db_password.txt
   WP_ADMIN_PASSWORD:
-    file: /Users/muxammad/Desktop/Inception/secrets/credentials.txt
+    file: ../secrets/credentials.txt
