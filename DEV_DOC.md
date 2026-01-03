@@ -70,6 +70,7 @@ Map the project domain to localhost in your `/etc/hosts` file:
 ```bash
 # Add this line to /etc/hosts
 127.0.0.1       mukibrok.42.fr
+::1       mukibrok.42.fr
 ```
 
 ---
@@ -94,11 +95,8 @@ DOMAIN_NAME=mukibrok.42.fr
 # Database credentials
 DB_NAME=wordpress
 DB_USER=user
-DB_PASSWORD=userpassword
-DB_ROOT_PASSWORD=rootpassword
 # WordPress Admin
 WP_ADMIN_USER=admin
-WP_ADMIN_PASSWORD=adminpassword
 WP_ADMIN_EMAIL=admin@student.42.fr
 WP_TITLE=Inception
 WP_URL=https://mukibrok.42.fr
@@ -107,27 +105,20 @@ WP_URL=https://mukibrok.42.fr
 ### 3. Setup Secrets
 
 The project uses Docker Secrets for secure password management.
-Create the `secrets/` directory and populate the files:
+You can automatically create the secrets directory and files using the Makefile:
 
 ```bash
-mkdir -p secrets
-echo "rootpassword" > secrets/db_root_password.txt
-echo "userpassword" > secrets/db_password.txt
-echo "adminpassword" > secrets/credentials.txt
+make secrets
 ```
 
 *Note: Ensure `secrets/` is added to `.gitignore`.*
 
 ### 4. Create Data Directories
 
-On the host machine, standard data directories are required for volumes:
+Data directories for volumes are automatically created by the Makefile during the build process.
+The `make` command will create them at `$(pwd)/data/`.
 
-```bash
-mkdir -p /Users/muxammad/Desktop/Inception/data/mariadb
-mkdir -p /Users/muxammad/Desktop/Inception/data/wordpress
-```
-
-*(The Makefile handles this automatically)*
+*(No manual action required)*
 
 ---
 
@@ -143,9 +134,12 @@ The `Makefile` simplifies common Docker Compose operations.
 | `make start` | `docker compose up` | Starts existing containers. |
 | `make stop` | `docker compose down` | Stops and removes containers/networks. |
 | `make restart` | `docker compose restart` | Restarts all containers. |
+| `make rm` | `docker compose rm` | Removes stopped service containers. |
 | `make ps` | `docker compose ps` | Lists running containers. |
-| `make logs` | `docker compose logs` | streams logs from all containers. |
-| `make clean` | `... down --volumes` + prune | **Destructive**: Removes all containers, images, volumes, and networks. |
+| `make logs` | `docker compose logs` | Streams logs from all containers. |
+| `make secrets` | `mkdir ...` | Generates secrets for development. |
+| `make delete` | `rm -rf secrets` | Removes secret files. |
+| `make clean` | `... down --volumes` + prune | **Destructive**: Removes all containers, images, volumes, networks, and data. |
 
 ### Build Workflow
 
@@ -204,10 +198,18 @@ docker compose -f srcs/docker-compose.yml up -d --build wordpress
 
 Data persistence is handled via bind mounts to the host system.
 
-- **WordPress Volume**: `wordpress` -> `/Users/muxammad/Desktop/Inception/data/wordpress`
+- **WordPress Volume**: `wordpress` -> `${VOL_PATH}/wordpress`
   - Stores: Web files (`/var/www/html`)
-- **MariaDB Volume**: `mariadb` -> `/Users/muxammad/Desktop/Inception/data/mariadb`
+- **MariaDB Volume**: `mariadb` -> `${VOL_PATH}/mariadb`
   - Stores: Database files (`/var/lib/mysql`)
+
+**Customizing Volume Paths**:
+The default volume path is set to `$(pwd)/data` in the `Makefile`.
+To change the location of your data volumes, modify the `VOL_PATH` variable at the top of the `Makefile`:
+
+```makefile
+VOL_PATH=/path/to/your/custom/data/dir
+```
 
 ### Cleaning Volumes
 

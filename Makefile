@@ -1,39 +1,54 @@
 COMPOSE_FILE=srcs/docker-compose.yml
+VOL_PATH=$(shell pwd)/data
+DOCKER=VOL_PATH=$(VOL_PATH) docker compose -f $(COMPOSE_FILE)
 
 build:
 	@echo "Creating directories..."
-	mkdir -p /Users/muxammad/Desktop/Inception/data/mariadb
-	mkdir -p /Users/muxammad/Desktop/Inception/data/wordpress
+	mkdir -p $(VOL_PATH)/mariadb
+	mkdir -p $(VOL_PATH)/wordpress
 	@echo "Building the project..."
-	@docker compose -f $(COMPOSE_FILE) up --build
+	@$(DOCKER) up --build
 
 start:
 	@echo "Starting the project..."
-	@docker compose -f $(COMPOSE_FILE) up
+	@$(DOCKER) up
 
 stop:
 	@echo "Stopping the project..."
-	@docker compose -f $(COMPOSE_FILE) down
+	@$(DOCKER) down
 
 restart:
 	@echo "Restarting the project..."
-	@docker compose -f $(COMPOSE_FILE) restart
+	@$(DOCKER) restart
 
 rm:
 	@echo "Removing the project..."
-	@docker compose -f $(COMPOSE_FILE) rm
+	@$(DOCKER) rm
 
 ps:
 	@echo "Listing the project..."
-	@docker compose -f $(COMPOSE_FILE) ps
+	@$(DOCKER) ps
 
 logs:
 	@echo "Listing the logs..."
-	docker compose -f $(COMPOSE_FILE) logs
+	$(DOCKER) logs
+
+secrets:
+	@echo "Creating secrets..."
+	@mkdir -p secrets
+	@echo "mukibrok2002" > secrets/db_root_password.txt
+	@echo "wpuser2002" > secrets/db_password.txt
+	@echo "mukibrok2002" > secrets/credentials.txt
+	@echo "Secrets created successfully"
+
+delete:
+	@echo "Deleting secrets..."
+	@rm -rf secrets
+	@echo "Secrets deleted successfully"
 
 clean:
 	@echo "Cleaning the project..."
-	@docker compose -f $(COMPOSE_FILE) down --volumes
+	@$(DOCKER) down --volumes
 	@docker container prune -f
 	@docker network prune -f
 	@docker volume prune -f
