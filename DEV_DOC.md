@@ -34,7 +34,7 @@ The project implements a microservices architecture using Docker containers. Eac
 
 ### Network Topology
 
-```
+```ascii
            [Host Machine]
                  |
       (Port 443:443 mapped)
@@ -65,13 +65,19 @@ Ensure your development environment has the following software installed:
 
 ### Initial Setup
 
-Map the project domain to localhost in your `/etc/hosts` file:
+No manual configuration of `/etc/hosts` is required. The `Makefile` automatically handles this:
 
-```bash
-# Add this line to /etc/hosts
-127.0.0.1       mukibrok.42.fr
-::1       mukibrok.42.fr
+```makefile
+setup-hosts:
+    @if grep -q "$(DOMAIN)" /etc/hosts; then \
+        echo "$(DOMAIN) already in /etc/hosts"; \
+    else \
+        echo "Adding $(DOMAIN) to /etc/hosts"; \
+        echo "127.0.0.1 $(DOMAIN)" | sudo tee -a /etc/hosts; \
+    fi
 ```
+
+During the first build, you may be prompted for your `sudo` password to allow this change.
 
 ---
 
@@ -145,10 +151,11 @@ The `Makefile` simplifies common Docker Compose operations.
 
 When you run `make`:
 
-1. **Build**: Docker builds images for `nginx`, `wordpress`, and `mariadb` using local Dockerfiles.
-2. **Network**: Creates `inception-network`.
-3. **Volumes**: Mounts host directories to container volumes.
-4. **Start**: Containers start in dependency order (MariaDB -> WordPress -> NGINX).
+1. **Host Setup**: Checks and configures `/etc/hosts` if needed (via `setup-hosts`).
+2. **Build**: Docker builds images for `nginx`, `wordpress`, and `mariadb` using local Dockerfiles.
+3. **Network**: Creates `inception-network`.
+4. **Volumes**: Mounts host directories to container volumes.
+5. **Start**: Containers start in dependency order (MariaDB -> WordPress -> NGINX).
 
 ---
 
