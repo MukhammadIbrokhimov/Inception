@@ -4,7 +4,7 @@ DOCKER=VOL_PATH=$(VOL_PATH) docker compose -f $(COMPOSE_FILE)
 
 DOMAIN=mukibrok.42.fr
 
-build: setup-hosts
+build: setup-hosts secrets
 	@echo "Creating directories..."
 	mkdir -p $(VOL_PATH)/mariadb
 	mkdir -p $(VOL_PATH)/wordpress
