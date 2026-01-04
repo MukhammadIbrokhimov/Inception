@@ -45,7 +45,8 @@ Build and start all services:
 make
 ```
 
-*Note: The first launch may take a few minutes as images are built and the database is initialized.*
+*Note 1: The first launch may ask for your password (`sudo`) to automatically configure the domain in `/etc/hosts`.*
+*Note 2: It may check a few minutes as images are built and the database is initialized.*
 
 ### Stopping the Project
 

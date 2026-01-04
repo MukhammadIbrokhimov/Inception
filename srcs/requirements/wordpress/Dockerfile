@@ -19,7 +19,6 @@ RUN apk update && apk add --no-cache \
 	php-zip \
 	php-redis \
 	php-phar \
-	mariadb-client \
 	wget \
 	curl \
 	bash \

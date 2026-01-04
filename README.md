@@ -22,15 +22,11 @@ All services are built from Alpine Linux (or Debian) base images and configured 
 
 - Docker and Docker Compose installed.
 - `make` utility.
-- `setup` of domain name mapping in `/etc/hosts`:
-
-    ```bash
-    127.0.0.1 mukibrok.42.fr
-    ```
+- **Note**: The domain `mukibrok.42.fr` will be automatically configured in `/etc/hosts` by the `Makefile`.
 
 ### Compilation & Installation
 
-This project uses a `Makefile` to automate the build process.
+This project uses a `Makefile` to automate the build process and environment setup.
 
 To build the Docker images and set up the networks/volumes:
 
@@ -38,7 +34,7 @@ To build the Docker images and set up the networks/volumes:
 make
 ```
 
-This command triggers `docker compose up --build`.
+This command triggers `setup-hosts` (which may ask for `sudo` password to update `/etc/hosts`) and then `docker compose up --build`.
 
 ### Execution
 
