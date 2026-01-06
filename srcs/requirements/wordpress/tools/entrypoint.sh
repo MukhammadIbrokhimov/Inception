@@ -30,6 +30,10 @@ until nc -z "${DB_HOST}" 3306; do
   sleep 1
 done
 
+#if ! wp user get evaluator --allow-root >/dev/null 2>&1; then
+#    wp user create evaluator evaluator@42.fr --role=author --user_pass=password123 --allow-root
+#fi
+
 if [ ! -f /var/www/html/wp-config.php ]; then
 	wp config create \
 	--dbname="${DB_NAME}" \
@@ -52,6 +56,5 @@ fi
 else
 echo "ENV_FILE=1 → skipping DB and WP initialization"
 fi
-
 
 exec "$@"

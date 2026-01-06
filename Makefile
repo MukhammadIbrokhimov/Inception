@@ -1,5 +1,5 @@
 COMPOSE_FILE=srcs/docker-compose.yml
-VOL_PATH=$(shell pwd)/data
+VOL_PATH=/home/mukibrok/data
 DOCKER=VOL_PATH=$(VOL_PATH) docker compose -f $(COMPOSE_FILE)
 
 DOMAIN=mukibrok.42.fr
