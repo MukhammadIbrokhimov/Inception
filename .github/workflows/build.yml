@@ -1,0 +1,44 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-compose:
+    name: Validate docker-compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create placeholder secrets (for config validation only)
+        run: |
+          mkdir -p secrets
+          echo "ci-placeholder" > secrets/db_root_password.txt
+          echo "ci-placeholder" > secrets/db_password.txt
+          echo "ci-placeholder" > secrets/credentials.txt
+
+      - name: Validate compose file
+        run: |
+          docker compose -f srcs/docker-compose.yml config -q
+          echo "compose file is valid"
+
+  lint-dockerfiles:
+    name: Lint Dockerfiles
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile:
+          - srcs/requirements/nginx/Dockerfile
+          - srcs/requirements/wordpress/Dockerfile
+          - srcs/requirements/mariadb/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
+          failure-threshold: error

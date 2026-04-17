@@ -1,10 +1,10 @@
-*This project has been created as part of the 42 curriculum by mukibrok*
-
 # Inception
 
-## 📖 Description
+[![build](https://github.com/MukhammadIbrokhimov/Inception/actions/workflows/build.yml/badge.svg)](https://github.com/MukhammadIbrokhimov/Inception/actions/workflows/build.yml)
 
-This project aims to broaden your knowledge of system administration by using Docker to virtualize several Docker images, creating a personal web server. The goal is to set up a small infrastructure composed of different services following specific rules for security, performance, and best practices.
+A containerised web stack — NGINX + WordPress (PHP-FPM) + MariaDB — built from scratch on Alpine/Debian base images, orchestrated with Docker Compose, and wired together on an isolated bridge network with persistent volumes. Part of the 42 Berlin Common Core.
+
+## Description
 
 The infrastructure consists of:
 
@@ -63,11 +63,7 @@ Detailed documentation has been generated for this project:
 
 ### AI Usage
 
-This documentation and some debugging steps were assisted by an AI agent (Antigravity/Gemini). The AI was used to:
-
-- Analyze configuration files (`Makefile`, `docker-compose.yml`).
-- Generate comprehensive documentation files.
-- Clarify architectural concepts.
+The documentation in this repository was polished with help from an AI agent (Antigravity/Gemini). All configuration files, Dockerfiles, and the `Makefile` are my own work.
 
 ## 🧠 Project Concepts
 
